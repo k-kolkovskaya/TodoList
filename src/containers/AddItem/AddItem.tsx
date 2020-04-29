@@ -7,13 +7,6 @@ import { IAddItemProps } from "./IAddItemProps";
 import theme from "../../styles/theme.style";
 
 const addItem: React.SFC<IAddItemProps> = (props) => {
-
-    const [text, setText] = useState("");
-
-    const onChange = (textValue: string) => {
-        setText(textValue);
-    }
-
     return (
         <View>
             <TouchableOpacity style={styles.btn} onPress={props.addItem}>
@@ -43,7 +36,7 @@ const styles = StyleSheet.create({
     },
     btnText: {
         color: theme.LIGHTGREY_COLOR,
-        fontSize: theme.FONT_SIZE_SMALL,
+        fontSize: theme.FONT_SIZE_MEDIUM,
     }
 });
 

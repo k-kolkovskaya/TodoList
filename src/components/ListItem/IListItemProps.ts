@@ -5,4 +5,5 @@ export interface IListItemProps {
     deleteItem: (id: string) => void;
     editModeOn: (id: string) => void;
     editModeOff: (id: string, text: string) => void;
+    checkBoxChange: (id: string) => void;
 }

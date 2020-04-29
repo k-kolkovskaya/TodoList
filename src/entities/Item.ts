@@ -3,4 +3,5 @@ export interface IItem {
     id: string;
     editMode: boolean;
     completed: boolean;
+    newItem: boolean;
 }

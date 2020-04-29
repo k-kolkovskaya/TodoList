@@ -25,8 +25,11 @@ const listItem: React.SFC<IListItemProps> = (props) => {
                         style={styles.ListItemDrag}
                     />
                     <CheckBox
-                        tintColors={{ true: theme.PRIMARY_COLOR, false: theme.SECONDARY_COLOR }}
+                        tintColors={{ true: theme.LIGHTGREY_COLOR, false: theme.SECONDARY_COLOR }}
                         style={styles.ListItemCheckbox}
+                        value={props.item.completed}
+                        disabled={props.item.completed}
+                        onChange={() => props.checkBoxChange(props.item.id)}
                     />
                     {props.item.editMode
                         ? <TextInput
@@ -37,7 +40,12 @@ const listItem: React.SFC<IListItemProps> = (props) => {
                             onChangeText={onChange}
                             onSubmitEditing={() => props.editModeOff(props.item.id, text)}
                         />
-                        : <Text style={styles.ListItemText} onPress={() => props.editModeOn(props.item.id)}>
+                        : <Text
+                            style={props.item.completed
+                                ? styles.ListItemTextDisabled
+                                : styles.ListItemText}
+                            onPress={() => props.editModeOn(props.item.id)}
+                        >
                             {props.item.text}
                         </Text>}
                 </View>
@@ -75,6 +83,14 @@ const styles = StyleSheet.create({
         color: theme.TEXT_COLOR,
         lineHeight: 24,
         padding: 0
+    },
+    ListItemTextDisabled: {
+        fontSize: theme.FONT_SIZE_MEDIUM,
+        color: theme.LIGHTGREY_COLOR,
+        lineHeight: 24,
+        padding: 0,
+        textDecorationLine: 'line-through',
+        textDecorationStyle: "solid"
     },
     ListItemInput: {
         fontSize: theme.FONT_SIZE_MEDIUM,
