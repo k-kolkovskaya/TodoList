@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet, TextInput, TouchableOpacity } from "react-native";
-import Icon from "react-native-vector-icons/dist/FontAwesome";
+import Icon from "react-native-vector-icons/dist/MaterialIcons";
 
 import { IAddItemProps } from "./IAddItemProps";
+
+import theme from "../../styles/theme.style";
 
 const addItem: React.SFC<IAddItemProps> = (props) => {
 
@@ -14,12 +16,11 @@ const addItem: React.SFC<IAddItemProps> = (props) => {
 
     return (
         <View>
-            <TextInput placeholder="Add Item..." style={styles.input} onChangeText={onChange} />
-            <TouchableOpacity style={styles.btn} onPress={() => { props.addItem(text) }}>
+            <TouchableOpacity style={styles.btn} onPress={props.addItem}>
+                <Icon name="add" size={20} style={styles.btnIcon} color={theme.LIGHTGREY_COLOR} />
                 <Text style={styles.btnText}>
-                    <Icon name="plus" size={20} />
-                    Add Item
-                    </Text>
+                    List Item
+                </Text>
             </TouchableOpacity>
         </View>
     )
@@ -32,14 +33,17 @@ const styles = StyleSheet.create({
         fontSize: 16
     },
     btn: {
-        backgroundColor: "#c2bad8",
         padding: 9,
+        paddingLeft: 68,
+        flexDirection: "row",
         margin: 5
     },
+    btnIcon: {
+        marginRight: 30
+    },
     btnText: {
-        color: "darkslateblue",
-        fontSize: 20,
-        textAlign: "center"
+        color: theme.LIGHTGREY_COLOR,
+        fontSize: theme.FONT_SIZE_SMALL,
     }
 });
 
