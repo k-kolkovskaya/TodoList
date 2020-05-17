@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, StyleSheet, FlatList, Text, Alert } from "react-native";
 import 'react-native-get-random-values';
-import { uuid } from 'uuidv4';
+import axios from "../axios-items";
 
 import styles from "./App.style";
 import theme from "../styles/theme.style";
@@ -11,39 +11,61 @@ import ListItem from "../components/ListItem/ListItem";
 import AddItem from "./AddItem/AddItem";
 import Icon from "react-native-vector-icons/dist/MaterialIcons";
 
+import { IItem } from "../entities/Item";
+
 const app = () => {
 
-    const [items, setItems] = useState([
-        { id: uuid(), text: "Task 1", editMode: false, completed: true, newItem: false },
-        { id: uuid(), text: "Task 2", editMode: false, completed: false, newItem: false },
-        { id: uuid(), text: "Borrow some worms from Сhristina for dinner", editMode: false, completed: false, newItem: false },
-    ]);
+    const [items, setItems] = useState<IItem[] | undefined>(undefined);
 
     const [showCompleted, setShowCompleted] = useState(true);
 
-    const inCompletedItems = items.filter(item => !item.completed);
-    const completedItems = items.filter(item => item.completed);
+    console.log(items);
+
+
+
+    useEffect(() => {
+        const fetchDataAsync = async () => {
+            await axios.get('/items.json')
+                .then(res => {
+                    const fetchedItems: IItem[] = [];
+                    for (let key in res.data) {
+                        fetchedItems.push({
+                            ...res.data[key],
+                            id: key
+                        })
+                    }
+                    setItems(fetchedItems)
+                })
+                .catch(e => Alert.alert("Error", e.text));
+        }
+        fetchDataAsync()
+    }, []);
+
+    let inCompletedItems = items ? items.filter(item => !item.completed) : [];
+    let completedItems = items ? items.filter(item => item.completed) : [];
 
     const deleteItemHandler = (id: string) => {
+        axios.delete(`/items/${id}.json`);
         setItems(prevItems => {
-            return prevItems.filter(item => item.id !== id);
+            return prevItems ? prevItems.filter(item => item.id !== id) : prevItems;
         });
     }
 
     const editModeOnHandler = (id: string) => {
         setItems(prevItems => {
-            prevItems.forEach(item => {
+            prevItems ? prevItems.forEach(item => {
                 if (item.id === id) {
                     item.editMode = true;
+                    axios.put(`/items/${id}.json`, item);
                 }
-            })
-            return [...prevItems]
+            }) : prevItems
+            return prevItems ? [...prevItems] : prevItems
         });
     }
 
     const editModeOffHandler = (id: string, text: string) => {
         setItems(prevItems => {
-            prevItems.forEach(item => {
+            prevItems ? prevItems.forEach(item => {
                 if (item.id === id) {
                     if (!text) {
                         Alert.alert("Error", "Please enter the text")
@@ -54,28 +76,40 @@ const app = () => {
                             addItemHandler();
                             item.newItem = false;
                         }
+                        axios.put(`/items/${id}.json`, item);
                     }
                 }
-            })
-            return [...prevItems]
+            }) : prevItems
+            return prevItems ? [...prevItems] : prevItems
         });
     }
 
-    const addItemHandler = () => {
+    const addItemHandler = async () => {
+        const response = await fetch("https://to-do-list-c1ef9.firebaseio.com/items.json", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ text: "", editMode: true, completed: false, newItem: true })
+        })
+
+        const data = await response.json();
         setItems(prevItems => {
-            return [...prevItems, { id: uuid(), text: "", editMode: true, completed: false, newItem: true }]
+            return prevItems ? [...prevItems, { id: data.name, text: "", editMode: true, completed: false, newItem: true }] : [{ id: data.name, text: "", editMode: true, completed: false, newItem: true }]
         })
     }
 
     const checkBoxHandler = (id: string) => {
         setItems(prevItems => {
-            prevItems.forEach(item => {
+            prevItems ? prevItems.forEach(item => {
                 if (item.id === id) {
                     item.completed = !item.completed;
+                    axios.put(`/items/${id}.json`, item)
+                        .catch(e => Alert.alert("Error", e));
                 }
-            })
-            return [...prevItems]
+            }) : prevItems
+            return prevItems ? [...prevItems] : prevItems
         });
+
+
     }
 
     const showCompletedHandler = () => {
